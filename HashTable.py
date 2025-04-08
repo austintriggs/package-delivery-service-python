@@ -28,6 +28,7 @@ class HashTable:
     def lookup(self, key):
         """Retrieve a value by key"""
         index = self._hash(key)
+
         if self.table[index] is not None:
             # Search for key in this bucket
             for k, v in self.table[index]:
@@ -38,10 +39,13 @@ class HashTable:
     def delete(self, key):
         """Remove a key-value pair from the hash table"""
         index = self._hash(key)
+
         if self.table[index] is not None:
-            # Search for key-value pair in this bucket
+            # Iterate through existing list of key-value pairs in current bucket
             for i, (k, v) in enumerate(self.table[index]):
                 if k == key:
+                    # Remove key-value pair
                     del self.table[index][i]
+                # If bucket is now empty, set it to None
                 if not self.table[index]:
                     self.table[index] = None
