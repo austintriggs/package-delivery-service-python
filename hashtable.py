@@ -1,5 +1,5 @@
 class HashTable:
-    def __init__(self, capacity=20):
+    def __init__(self, capacity=40):
         self.capacity = capacity
         self.table = [None] * capacity
 
@@ -49,3 +49,6 @@ class HashTable:
                 # If bucket is now empty, set it to None
                 if not self.table[index]:
                     self.table[index] = None
+
+    def __str__(self):
+        return str(self.__dict__)
