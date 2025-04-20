@@ -1,3 +1,5 @@
+# Student ID: 010873710
+import copy
 import csv
 import datetime
 
@@ -60,26 +62,23 @@ def deliver_packages(truck, ht):
 
     # Calculate time to delivery
     _time = round(60*float(distance_between(truck.address, _next_delivery.address))/truck.speed)
-    print(truck.depart_time)
     _truck_time = datetime.datetime.strptime(truck.depart_time, "%H:%M:%S").time()
     _time_object = datetime.datetime.combine(datetime.date.today(), _truck_time)
     _delivery_time = (_time_object + datetime.timedelta(minutes=_time)).time()
     truck.depart_time = str(_delivery_time)
-    print(f'delivery time: {_delivery_time}')
-    # truck.depart_time = truck.depart_time + _delivery_time
-    print(f'_time: {_time}')
+
     # Update truck mileage
     truck.mileage += float(distance_between(truck.address, _next_delivery.address))
+
     # Update truck location
     truck.address = _next_delivery.address
+
     # Remove package from truck package list
     truck.packages.remove(_next_delivery)
+
     # Mark package as delivered and update delivery time
     ht.lookup(_next_delivery.id).status = "Delivered"
     ht.lookup(_next_delivery.id).delivery_time = str(_delivery_time)
-
-    print(f'ht.lookup(package.id): {ht.lookup(_next_delivery.id)}')
-    print(_next_delivery)
 
 def main():
     truck1 = Truck()
@@ -93,7 +92,8 @@ def main():
         if 'EOD' not in ht.lookup(i+1).deadline and not ht.lookup(i+1).notes:
             truck1.packages.append(ht.lookup(i+1))
             ht.lookup(i+1).status = "On Truck For Delivery"
-    print(len(truck1.packages))
+            ht.lookup(i+1).departure_time = truck1.depart_time
+            ht.lookup(i+1).delivery_truck = "truck1"
 
     # Load truck 1 with additional packages that have the same address
     for i in range(len(truck1.packages)):
@@ -101,6 +101,12 @@ def main():
             if truck1.packages[i].address == ht.lookup(j+1).address and not ht.lookup(j+1).notes and ht.lookup(j+1).status == "At Hub":
                 truck1.packages.append(ht.lookup(j+1))
                 ht.lookup(j+1).status = "On Truck For Delivery"
+                ht.lookup(j+1).departure_time = truck1.depart_time
+                ht.lookup(i + 1).delivery_truck = "truck1"
+
+    # Packages for truck 1 delivery 1 08:00 AM - 9:20 AM
+    # truck1_delivery_1 = copy.deepcopy(truck1.packages)
+    # print(f'truck1_delivery_1: {truck1_delivery_1}')
 
     # Deliver packages in truck 1
     while len(truck1.packages) > 0:
@@ -112,7 +118,12 @@ def main():
         if ht.lookup(i+1).notes and ht.lookup(i+1).status == "At Hub" and ht.lookup(i+1).id != 9:
             truck2.packages.append(ht.lookup(i+1))
             ht.lookup(i+1).status = "On Truck For Delivery"
-    print(f'truck 2 packages len: {len(truck2.packages)}')
+            ht.lookup(i+1).departure_time = truck2.depart_time
+            ht.lookup(i+1).delivery_truck = "truck2"
+
+    # Packages for truck 2 delivery 1 09:05 AM - 10:57 AM
+    # truck2_delivery_1 = truck2.packages
+    # print(f'truck1_delivery_2: {truck2_delivery_1}')
 
     # Deliver packages in truck 2
     while len(truck2.packages) > 0:
@@ -132,58 +143,112 @@ def main():
     for i in range(len(ht.table)):
         if ht.lookup(i+1).status == "At Hub":
             truck1.packages.append(ht.lookup(i+1))
+            ht.lookup(i+1).departure_time = truck1.depart_time
+            ht.lookup(i + 1).delivery_truck = "truck1_2"
 
+    # Packages for truck 1 delivery 2 at 10:20 AM - 12:30 PM
+    # truck1_delivery_2 = truck1.packages
+
+    # Deliver packages
     while len(truck1.packages) > 0:
         deliver_packages(truck1, ht)
 
-    # Return truck 1 to hub
-    # truck1.mileage += float(distance_between(truck1.address, "4001 South 700 East"))
-    # print(f'truck1 depart time: {truck1.depart_time}')
-
-    # for i in range(len(ht.table)):
-    #     if ht.lookup(i+1).notes:
-    #         truck2.packages.append(ht.lookup(i+1))
-    #         ht.lookup(i+1).status = "On Truck For Delivery"
-    #     # print(ht.lookup(i+1))
-    #     elif 'EOD' not in ht.lookup(i+1).deadline and not ht.lookup(i+1).notes:
-    #     # elif not ht.lookup(i+1).notes and len(truck1.packages) < truck1.capacity:
-    #         truck1.packages.append(ht.lookup(i+1))
-    #         ht.lookup(i+1).status = "On Truck For Delivery"
-    #     print(ht.lookup(i+1))
-
-
-    # truck1_next_delivery = truck1.packages[0]
-    # print(f'truck1_next_delivery: {truck1_next_delivery}')
-    # for package in truck1.packages:
-    #     # print(truck1_next_delivery)
-    #     if float(distance_between(truck1.address, package.address)) < float(distance_between(truck1.address, truck1_next_delivery.address)):
-    #         truck1_next_delivery = package
-    #     print(distance_between(truck1.address, package.address))
-    # print(f'truck1_next_delvivery: {truck1_next_delivery}')
-    # print(distance_between(truck1.address, truck1_next_delivery.address))
-    # print(len(truck1.packages))
-    # print(truck1.mileage)
-    # deliver_packages(truck1, ht)
-
-    # while len(truck1.packages) > 0:
-    #     deliver_packages(truck1, ht)
-    print(len(truck1.packages))
-    print(truck1.mileage)
-    print(truck1.depart_time)
-
     # num = 0
     # for i in range(len(ht.table)):
-    #     if 'Delivered' in ht.lookup(i+1).status and ht.lookup(i+1).notes:
+    #     if 'EOD' not in ht.lookup(i+1).deadline:
     #         num += 1
     #         print(ht.lookup(i+1))
     # print(num)
 
-    num = 0
-    for i in range(len(ht.table)):
-        if 'EOD' not in ht.lookup(i+1).deadline:
-            num += 1
-            print(ht.lookup(i+1))
-    print(num)
+    print("===========================================")
+    print("Western Governors University Parcel Service")
+    print("===========================================")
+
+    # Display menu options
+    print("\nPlease select a menu option to generate a report or retrieve package information\n")
+    print("\t 1. Print All Package Status and Total Mileage")
+    print("\t 2. Print a Single Package Status with a Time")
+    print("\t 3. Print All Package Status Between Two Times")
+    print("\t 4. Exit")
+
+    valid_options = [1, 2, 3, 4]
+
+    # Prompt the user for option selection
+    option = None
+
+    while option is None:
+        user_input = input("\nEnter Menu Option: ")
+
+        if user_input.isdigit() and int(user_input) in valid_options:
+            option = int(user_input)
+        else:
+            print("Error: Invalid option provided.")
+
+    if option == 1:
+        for i in range(len(ht.table)):
+            print(f'PackageID: {ht.lookup(i+1).id}, Address: {ht.lookup(i+1).address}, City: {ht.lookup(i+1).city},'
+                  f'State: {ht.lookup(i+1).state}, Zip: {ht.lookup(i+1).zip}, Deadline: {ht.lookup(i+1).deadline},'
+                  f'Status: {ht.lookup(i+1).status}, Delivery Time: {ht.lookup(i+1).delivery_time}')
+        print(f'Total Mileage: {truck1.mileage + truck2.mileage}')
+
+    if option == 2:
+        pid = int(input("Enter Package ID: "))
+        hr = int(input("Enter Hour (0 - 23): "))
+        min = int(input("Enter Minute (0 - 59): "))
+        package = ht.lookup(pid)
+        lookup_time = str(datetime.time(hr, min, 0))
+
+        if lookup_time >= package.delivery_time:
+            print(f"Package Status: Delivered at {package.delivery_time}")
+
+        elif package.delivery_time > lookup_time >= package.departure_time:
+            print(f"Package Status: Out for delivery. Departed hub at {package.departure_time}")
+
+        else:
+            print(f"Package Status: At Hub")
+
+    if option == 3:
+        start_hr = int(input("Enter Start Hour (0 - 23): "))
+        start_min = int(input("Enter Start Minute (0 - 59): "))
+        finish_hr = int(input("Enter Finish Hour (0 - 23): "))
+        finish_min = int(input("Enter Finish Minute (0 - 59): "))
+        start_time = str(datetime.time(start_hr, start_min, 0))
+        finish_time = str(datetime.time(finish_hr, finish_min, 0))
+        _truck1_ = []
+        _truck2_ = []
+
+# Truck 1_1 : 8:00 - 9:20
+# Truck 1_2: 10:20 - 12:30
+# Truck 2: 9:05 - 10:57
+        for i in range(len(ht.table)):
+            if ht.lookup(i+1).departure_time <= start_time and finish_time >= ht.lookup(i+1).delivery_time\
+                    or finish_time >= ht.lookup(i+1).departure_time:
+                if ht.lookup(i+1).delivery_truck == 'truck1' or ht.lookup(i+1).delivery_truck == 'truck1_2':
+                    _truck1_.append(ht.lookup(i+1))
+                if ht.lookup(i+1).delivery_truck == 'truck2':
+                    _truck2_.append(ht.lookup(i+1))
+        print('\nTruck 1:')
+        for package in _truck1_:
+            if package.delivery_time > finish_time:
+                package.status = 'On Truck For Delivery'
+            if package.status == 'On Truck For Delivery':
+                print(f'PackageID: {package.id}, Package Status: {package.status}, Departed At: {package.departure_time}')
+            if package.status == 'Delivered':
+                print(f'PackageID: {package.id}, Package Status: {package.status}, Delivered At: {package.delivery_time}')
+
+        print('\nTruck 2:')
+        for package in _truck2_:
+            if package.delivery_time > finish_time:
+                package.status = 'On Truck For Delivery'
+            if package.status == 'On Truck For Delivery':
+                print(
+                    f'PackageID: {package.id}, Package Status: {package.status}, Departed At: {package.departure_time}')
+            if package.status == 'Delivered':
+                print(
+                    f'PackageID: {package.id}, Package Status: {package.status}, Delivered At: {package.delivery_time}')
+
+    if option == 4:
+        exit()
 
 if __name__ == '__main__':
     main()
