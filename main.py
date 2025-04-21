@@ -199,13 +199,13 @@ def main():
         lookup_time = str(datetime.time(hr, min, 0))
 
         if lookup_time >= package.delivery_time:
-            print(f"Package Status: Delivered at {package.delivery_time}")
+            print(f"Package ID: {package.id}, Package Status: Delivered at {package.delivery_time}")
 
         elif package.delivery_time > lookup_time >= package.departure_time:
-            print(f"Package Status: Out for delivery. Departed hub at {package.departure_time}")
+            print(f"Package ID: {package.id}, Package Status: Out for delivery. Departed hub at {package.departure_time}")
 
         else:
-            print(f"Package Status: At Hub")
+            print(f"Package ID: {package.id}, Package Status: At Hub")
 
     if option == 3:
         start_hr = int(input("Enter Start Hour (0 - 23): "))
