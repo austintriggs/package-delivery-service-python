@@ -7,6 +7,7 @@ from package import Package
 from hashtable import HashTable
 from truck import Truck
 
+# Space-Time Complexity: O(n)
 def load_package_data(hash_table):
     with open("csv_files/packages.csv") as package_info:
         packages = csv.reader(package_info)
@@ -21,11 +22,10 @@ def load_package_data(hash_table):
             pNotes = package[7]
             pStatus = "At Hub"
 
-
             p = Package(pId, pAddress, pCity, pState, pZip, pDeadline, pWeight, pNotes, pStatus)
-
             hash_table.insert(pId, p)
 
+# Space-Time Complexity: O(n²)
 def load_distance_data():
     distance_list = []
     with open("csv_files/distances.csv") as distance_info:
@@ -38,6 +38,7 @@ def load_distance_data():
                 distance_list[i][j] = distance_list[j][i]
     return distance_list
 
+# Space-Time Complexity: O(n)
 def load_address_data():
     address_list = []
     with open("csv_files/addresses.csv") as address_info:
@@ -46,11 +47,13 @@ def load_address_data():
             address_list.append(address[2])
     return address_list
 
+# Space-Time Complexity: O(1)
 def distance_between(address1, address2):
     distance_list = load_distance_data()
     address_list = load_address_data()
     return distance_list[address_list.index(address1)][address_list.index(address2)]
 
+# Space-Time Complexity: O(n)
 def deliver_packages(truck, ht):
     # Set next package to be delivered to first package on truck
     _next_delivery = truck.packages[0]
@@ -88,6 +91,7 @@ def main():
     load_package_data(ht)
 
     # Load truck 1 with packages that have a deadline and no notes
+    # Space-Time Complexity: O(n)
     for i in range(len(ht.table)):
         if 'EOD' not in ht.lookup(i+1).deadline and not ht.lookup(i+1).notes:
             truck1.packages.append(ht.lookup(i+1))
@@ -96,6 +100,7 @@ def main():
             ht.lookup(i+1).delivery_truck = "truck1"
 
     # Load truck 1 with additional packages that have the same address
+    # Space-Time Complexity: O(n²)
     for i in range(len(truck1.packages)):
         for j in range(len(ht.table)):
             if truck1.packages[i].address == ht.lookup(j+1).address and not ht.lookup(j+1).notes and ht.lookup(j+1).status == "At Hub":
@@ -104,15 +109,13 @@ def main():
                 ht.lookup(j+1).departure_time = truck1.depart_time
                 ht.lookup(i + 1).delivery_truck = "truck1"
 
-    # Packages for truck 1 delivery 1 08:00 AM - 9:20 AM
-    # truck1_delivery_1 = copy.deepcopy(truck1.packages)
-    # print(f'truck1_delivery_1: {truck1_delivery_1}')
-
     # Deliver packages in truck 1
+    # Space-Time Complexity: O(n²)
     while len(truck1.packages) > 0:
         deliver_packages(truck1, ht)
 
     # Load truck 2 with packages that have notes (e.g., delayed packages)
+    # Space-Time Complexity: O(n)
     truck2.depart_time = str(datetime.time(9, 5, 0))
     for i in range(len(ht.table)):
         if ht.lookup(i+1).notes and ht.lookup(i+1).status == "At Hub" and ht.lookup(i+1).id != 9:
@@ -121,11 +124,8 @@ def main():
             ht.lookup(i+1).departure_time = truck2.depart_time
             ht.lookup(i+1).delivery_truck = "truck2"
 
-    # Packages for truck 2 delivery 1 09:05 AM - 10:57 AM
-    # truck2_delivery_1 = truck2.packages
-    # print(f'truck1_delivery_2: {truck2_delivery_1}')
-
     # Deliver packages in truck 2
+    # Space-Time Complexity: O(n²)
     while len(truck2.packages) > 0:
         deliver_packages(truck2, ht)
 
@@ -140,25 +140,17 @@ def main():
     ht.lookup(9).zip = '84111'
 
     # Load Truck 1 with remaining packages
+    # Space-Time Complexity: O(n)
     for i in range(len(ht.table)):
         if ht.lookup(i+1).status == "At Hub":
             truck1.packages.append(ht.lookup(i+1))
             ht.lookup(i+1).departure_time = truck1.depart_time
             ht.lookup(i + 1).delivery_truck = "truck1_2"
 
-    # Packages for truck 1 delivery 2 at 10:20 AM - 12:30 PM
-    # truck1_delivery_2 = truck1.packages
-
     # Deliver packages
+    # Space-Time Complexity: O(n²)
     while len(truck1.packages) > 0:
         deliver_packages(truck1, ht)
-
-    # num = 0
-    # for i in range(len(ht.table)):
-    #     if 'EOD' not in ht.lookup(i+1).deadline:
-    #         num += 1
-    #         print(ht.lookup(i+1))
-    # print(num)
 
     print("===========================================")
     print("Western Governors University Parcel Service")
@@ -174,6 +166,7 @@ def main():
     valid_options = [1, 2, 3, 4]
 
     # Prompt the user for option selection
+    # Space-Time Complexity: O(1)
     option = None
 
     while option is None:
@@ -184,6 +177,7 @@ def main():
         else:
             print("Error: Invalid option provided.")
 
+    # Space-Time Complexity: O(n)
     if option == 1:
         for i in range(len(ht.table)):
             print(f'PackageID: {ht.lookup(i+1).id}, Address: {ht.lookup(i+1).address}, City: {ht.lookup(i+1).city},'
@@ -191,6 +185,7 @@ def main():
                   f'Status: {ht.lookup(i+1).status}, Delivery Time: {ht.lookup(i+1).delivery_time}')
         print(f'Total Mileage: {truck1.mileage + truck2.mileage}')
 
+    # Space-Time Complexity: O(1)
     if option == 2:
         pid = int(input("Enter Package ID: "))
         hr = int(input("Enter Hour (0 - 23): "))
@@ -207,6 +202,7 @@ def main():
         else:
             print(f"Package ID: {package.id}, Package Status: At Hub")
 
+    # Space-Time Complexity: O(n)
     if option == 3:
         start_hr = int(input("Enter Start Hour (0 - 23): "))
         start_min = int(input("Enter Start Minute (0 - 59): "))
@@ -217,9 +213,6 @@ def main():
         _truck1_ = []
         _truck2_ = []
 
-# Truck 1_1 : 8:00 - 9:20
-# Truck 1_2: 10:20 - 12:30
-# Truck 2: 9:05 - 10:57
         for i in range(len(ht.table)):
             if ht.lookup(i+1).departure_time <= start_time and finish_time >= ht.lookup(i+1).delivery_time\
                     or finish_time >= ht.lookup(i+1).departure_time:
