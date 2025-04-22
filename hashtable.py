@@ -54,6 +54,5 @@ class HashTable:
                 if not self.table[index]:
                     self.table[index] = None
 
-    # Space-Time Complexity: O(n)
     def __str__(self):
         return str(self.__dict__)
