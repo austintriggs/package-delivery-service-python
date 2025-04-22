@@ -3,10 +3,12 @@ class HashTable:
         self.capacity = capacity
         self.table = [None] * capacity
 
+    # Space-Time Complexity: O(1)
     def _hash(self, key):
         """Hash function to convert key to an index"""
         return hash(key) % self.capacity
 
+    # Space-Time Complexity: O(n)
     def insert(self, key, value):
         """Insert or update a key-value pair in the hash table"""
         index = self._hash(key)
@@ -25,6 +27,7 @@ class HashTable:
             if not found:
                 self.table[index].append((key, value))
 
+    # Space-Time Complexity: O(n)
     def lookup(self, key):
         """Retrieve a value by key"""
         index = self._hash(key)
@@ -36,6 +39,7 @@ class HashTable:
                     return v
         return None
 
+    # Space-Time Complexity: O(n)
     def delete(self, key):
         """Remove a key-value pair from the hash table"""
         index = self._hash(key)
@@ -50,5 +54,6 @@ class HashTable:
                 if not self.table[index]:
                     self.table[index] = None
 
+    # Space-Time Complexity: O(n)
     def __str__(self):
         return str(self.__dict__)

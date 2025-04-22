@@ -1,5 +1,4 @@
 # Student ID: 010873710
-import copy
 import csv
 import datetime
 
