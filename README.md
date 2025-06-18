@@ -42,7 +42,7 @@ package-delivery-service-python/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/package-delivery-service-python.git
+   git clone https://github.com/austintriggs/package-delivery-service-python.git
    cd package-delivery-service-python
    ```
 
